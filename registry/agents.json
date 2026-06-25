@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "agents": {
+    "codex": {
+      "liveConfig": "${HOME}/.codex/config.toml",
+      "generatedMcpConfig": ".agent-hub/generated/codex/config.mcp.toml",
+      "generatedInstructions": ".agent-hub/generated/codex/AGENTS.md",
+      "installStrategy": "merge-toml-mcp-blocks-after-review"
+    },
+    "claude": {
+      "liveConfig": "${HOME}/.claude/settings.json",
+      "generatedMcpConfig": ".agent-hub/generated/claude/settings.mcp.json",
+      "generatedInstructions": ".agent-hub/generated/claude/CLAUDE.md",
+      "installStrategy": "replace-json-mcpServers-after-review"
+    },
+    "opencode": {
+      "liveConfig": "${HOME}/.config/opencode/opencode.jsonc",
+      "generatedMcpConfig": ".agent-hub/generated/opencode/opencode.mcp.jsonc",
+      "generatedInstructions": ".agent-hub/generated/opencode/AGENTS.md",
+      "installStrategy": "replace-jsonc-mcp-after-review"
+    },
+    "github-copilot": {
+      "liveConfig": "${HOME}/.copilot/mcp-config.json",
+      "generatedMcpConfig": ".agent-hub/generated/copilot/mcp-config.json",
+      "generatedInstructions": ".agent-hub/generated/copilot/copilot-instructions.md",
+      "installStrategy": "replace-mcp-config-after-backup-and-review"
+    },
+    "cursor": {
+      "liveConfig": "${HOME}/.cursor/mcp.json",
+      "generatedMcpConfig": ".agent-hub/generated/cursor/mcp.json",
+      "generatedInstructions": ".agent-hub/generated/cursor/AGENTS.md",
+      "instructionInstallPath": ".cursor/rules/dotpe-rules.md",
+      "installStrategy": "replace-json-mcpServers-after-review"
+    }
+  }
+}

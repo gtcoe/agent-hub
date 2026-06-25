@@ -1,0 +1,218 @@
+{
+  "version": 1,
+  "defaultProfile": "work",
+  "profiles": {
+    "offline": {
+      "description": "No VPN or company network required.",
+      "servers": ["local-mysql"]
+    },
+    "work": {
+      "description": "Normal DotPe work profile. Requires VPN/internal network for staging services.",
+      "servers": [
+        "local-mysql",
+        "staging-mysql",
+        "prod-mysql",
+        "staging-clickhouse",
+        "prod-clickhouse",
+        "staging-redis",
+        "gitlab",
+        "atlassian",
+        "staging-kafka",
+        "figma",
+        "notion"
+      ]
+    },
+    "groww-manual": {
+      "description": "Groww MCP only. Use this profile when Groww is explicitly needed.",
+      "servers": ["growwmcp"]
+    },
+    "safe-data": {
+      "description": "Read-only data access only. Prefer this profile for routine agent work.",
+      "servers": [
+        "staging-mysql",
+        "staging-clickhouse",
+        "prod-clickhouse",
+        "staging-redis",
+        "gitlab",
+        "atlassian"
+      ]
+    }
+  },
+  "servers": {
+    "local-mysql": {
+      "type": "stdio",
+      "description": "Local MySQL, writable. Defaults to loyaltyDB.",
+      "command": "${NODE20_BIN}/mcp-server-mysql",
+      "env": {
+        "MYSQL_HOST": "localhost",
+        "MYSQL_PORT": "3306",
+        "MYSQL_USER": "${LOCAL_MYSQL_USER}",
+        "MYSQL_PASS": "${LOCAL_MYSQL_PASS}",
+        "MYSQL_DB": "${LOCAL_MYSQL_DB:-loyaltyDB}",
+        "ALLOW_INSERT_OPERATION": "true",
+        "ALLOW_UPDATE_OPERATION": "true",
+        "ALLOW_DELETE_OPERATION": "true",
+        "PATH": "/opt/homebrew/opt/mysql-client@8.4/bin:${PATH}"
+      }
+    },
+    "staging-mysql": {
+      "type": "stdio",
+      "description": "Stage4 MySQL. Read-only; MYSQL_DB auto-detected from current service directory unless MYSQL_DB is already set.",
+      "command": "${NODE20_BIN}/mcp-server-mysql",
+      "serviceEnv": {
+        "MYSQL_DB": "mysqlDatabases"
+      },
+      "env": {
+        "MYSQL_HOST": "${STAGING_MYSQL_HOST}",
+        "MYSQL_PORT": "${STAGING_MYSQL_PORT:-3306}",
+        "MYSQL_USER": "${STAGING_MYSQL_USER}",
+        "MYSQL_PASS": "${STAGING_MYSQL_PASS}",
+        "ALLOW_INSERT_OPERATION": "false",
+        "ALLOW_UPDATE_OPERATION": "false",
+        "ALLOW_DELETE_OPERATION": "false",
+        "PATH": "/opt/homebrew/opt/mysql-client@8.4/bin:${PATH}"
+      }
+    },
+    "prod-mysql": {
+      "type": "stdio",
+      "description": "Production MySQL through SSH tunnel. Read-only; MYSQL_DB auto-detected from current service directory unless MYSQL_DB is already set.",
+      "command": "${AGENT_HUB_DIR}/bin/mysql-prod-mcp.sh",
+      "serviceEnv": {
+        "MYSQL_DB": "mysqlDatabases"
+      },
+      "env": {
+        "PROD_MYSQL_LOCAL_PORT": "${PROD_MYSQL_LOCAL_PORT:-33307}",
+        "PROD_MYSQL_REMOTE_HOST": "${PROD_MYSQL_REMOTE_HOST}",
+        "PROD_MYSQL_REMOTE_PORT": "${PROD_MYSQL_REMOTE_PORT:-3306}",
+        "PROD_MYSQL_USER": "${PROD_MYSQL_USER}",
+        "PROD_MYSQL_PASS": "${PROD_MYSQL_PASS}",
+        "PROD_SSH_KEY_PATH": "${PROD_SSH_KEY_PATH}",
+        "PROD_SSH_USER": "${PROD_SSH_USER}",
+        "PROD_BASTION_HOST": "${PROD_BASTION_HOST}",
+        "PATH": "/opt/homebrew/opt/mysql-client@8.4/bin:${PATH}"
+      },
+      "tunnel": {
+        "name": "prod-mysql",
+        "localPort": "${PROD_MYSQL_LOCAL_PORT:-33307}",
+        "remoteHost": "${PROD_MYSQL_REMOTE_HOST}",
+        "remotePort": "${PROD_MYSQL_REMOTE_PORT:-3306}",
+        "sshKey": "${PROD_SSH_KEY_PATH}",
+        "sshUser": "${PROD_SSH_USER}",
+        "bastionHost": "${PROD_BASTION_HOST}"
+      },
+      "risk": "prod"
+    },
+    "staging-clickhouse": {
+      "type": "stdio",
+      "description": "Staging ClickHouse CRM database.",
+      "command": "${CLICKHOUSE_MCP_BIN:-/opt/homebrew/bin/mcp-clickhouse}",
+      "env": {
+        "CLICKHOUSE_HOST": "${STAGING_CLICKHOUSE_HOST}",
+        "CLICKHOUSE_HOST_URL": "${STAGING_CLICKHOUSE_HOST_URL}",
+        "CLICKHOUSE_PORT": "${STAGING_CLICKHOUSE_PORT:-8123}",
+        "CLICKHOUSE_USER": "${STAGING_CLICKHOUSE_USER}",
+        "CLICKHOUSE_PASSWORD": "${STAGING_CLICKHOUSE_PASSWORD}",
+        "CLICKHOUSE_DATABASE": "${STAGING_CLICKHOUSE_DATABASE:-crm}",
+        "CLICKHOUSE_SECURE": "${STAGING_CLICKHOUSE_SECURE:-false}",
+        "CLICKHOUSE_VERIFY": "${STAGING_CLICKHOUSE_VERIFY:-false}"
+      },
+      "approval": {
+        "tools": {
+          "list_tables": "approve",
+          "run_query": "approve"
+        }
+      }
+    },
+    "prod-clickhouse": {
+      "type": "stdio",
+      "description": "Production ClickHouse over VPN/direct private network. Read-only CRM access.",
+      "command": "${CLICKHOUSE_MCP_BIN:-/opt/homebrew/bin/mcp-clickhouse}",
+      "env": {
+        "CLICKHOUSE_HOST": "${PROD_CLICKHOUSE_HOST}",
+        "CLICKHOUSE_HOST_URL": "${PROD_CLICKHOUSE_HOST_URL}",
+        "CLICKHOUSE_PORT": "${PROD_CLICKHOUSE_PORT:-8123}",
+        "CLICKHOUSE_USER": "${PROD_CLICKHOUSE_USER}",
+        "CLICKHOUSE_PASSWORD": "${PROD_CLICKHOUSE_PASSWORD}",
+        "CLICKHOUSE_DATABASE": "${PROD_CLICKHOUSE_DATABASE:-crm}",
+        "CLICKHOUSE_SECURE": "${PROD_CLICKHOUSE_SECURE:-false}",
+        "CLICKHOUSE_VERIFY": "${PROD_CLICKHOUSE_VERIFY:-false}"
+      },
+      "approval": {
+        "tools": {
+          "list_tables": "approve",
+          "run_query": "approve"
+        }
+      },
+      "risk": "prod"
+    },
+    "staging-redis": {
+      "type": "stdio",
+      "description": "Staging Redis. DB index auto-detected from current service directory unless REDIS_DB is already set.",
+      "command": "${NODE20_BIN}/mcp-server-redis",
+      "serviceEnv": {
+        "REDIS_DB": "redisDatabases"
+      },
+      "args": [
+        "redis://:${STAGING_REDIS_PASSWORD}@${STAGING_REDIS_HOST}:${STAGING_REDIS_PORT:-6379}/${REDIS_DB:-0}"
+      ]
+    },
+    "gitlab": {
+      "type": "stdio",
+      "description": "DotPe GitLab MCP.",
+      "command": "${NODE20_BIN}/mcp-server-gitlab",
+      "env": {
+        "GITLAB_PERSONAL_ACCESS_TOKEN": "${GITLAB_PERSONAL_ACCESS_TOKEN}",
+        "GITLAB_API_URL": "${GITLAB_API_URL:-https://gitlab.dotpe.in/api/v4}"
+      }
+    },
+    "atlassian": {
+      "type": "stdio",
+      "description": "DotPe Jira/Atlassian MCP.",
+      "command": "${ATLASSIAN_MCP_BIN}",
+      "args": [
+        "--jira-url",
+        "${JIRA_URL}",
+        "--jira-username",
+        "${JIRA_USERNAME}",
+        "--jira-token",
+        "${JIRA_TOKEN}"
+      ]
+    },
+    "staging-kafka": {
+      "type": "stdio",
+      "description": "Staging Kafka MCP through existing local server.",
+      "command": "${NODE_BIN:-node}",
+      "args": ["${HOME}/.copilot/kafka-mcp-server/index.js"],
+      "env": {
+        "KAFKA_BROKERS": "${STAGING_KAFKA_BROKERS}"
+      }
+    },
+    "figma": {
+      "type": "stdio",
+      "description": "Local Figma MCP via figma-mcp npm package.",
+      "command": "${NODE20_BIN}/node",
+      "args": ["${NODE20_BIN}/npx", "-y", "figma-mcp"],
+      "env": {
+        "FIGMA_API_KEY": "${FIGMA_API_KEY}"
+      }
+    },
+    "growwmcp": {
+      "type": "stdio",
+      "description": "Groww remote MCP through mcp-remote. Manual only because it can trigger browser auth popups.",
+      "manual": true,
+      "command": "${NODE20_BIN}/node",
+      "args": [
+        "${NODE20_BIN}/npx",
+        "-y",
+        "mcp-remote@0.1.18",
+        "https://mcp.groww.in/mcp",
+        "52155"
+      ]
+    },
+    "notion": {
+      "type": "remote",
+      "description": "Official Notion remote MCP.",
+      "url": "https://mcp.notion.com/mcp"
+    }
+  }
+}

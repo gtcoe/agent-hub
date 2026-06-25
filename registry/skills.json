@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "roots": [
+    {
+      "path": ".agent-hub/skills",
+      "description": "Canonical project skills — primary source of truth"
+    },
+    {
+      "path": "${HOME}/.agents/skills",
+      "description": "User-level skills (xlsx, find-skills) — kept referenced but not migrated"
+    }
+  ],
+  "agentOutputs": {
+    "index": "generated/skills/README.md"
+  }
+}

@@ -1,0 +1,17 @@
+#!/bin/sh
+set -eu
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+node "${SCRIPT_DIR}/agent-tunnel.js" ensure prod-clickhouse
+
+LOCAL_PORT="${PROD_CLICKHOUSE_LOCAL_PORT:-38123}"
+export CLICKHOUSE_HOST="127.0.0.1"
+export CLICKHOUSE_HOST_URL="http://127.0.0.1:${LOCAL_PORT}"
+export CLICKHOUSE_PORT="${LOCAL_PORT}"
+export CLICKHOUSE_USER="${PROD_CLICKHOUSE_USER:?PROD_CLICKHOUSE_USER is required}"
+export CLICKHOUSE_PASSWORD="${PROD_CLICKHOUSE_PASSWORD:?PROD_CLICKHOUSE_PASSWORD is required}"
+export CLICKHOUSE_DATABASE="${PROD_CLICKHOUSE_DATABASE:-crm}"
+export CLICKHOUSE_SECURE="${PROD_CLICKHOUSE_SECURE:-false}"
+export CLICKHOUSE_VERIFY="${PROD_CLICKHOUSE_VERIFY:-false}"
+
+exec "${CLICKHOUSE_MCP_BIN:-/opt/homebrew/bin/mcp-clickhouse}"

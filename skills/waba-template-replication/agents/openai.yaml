@@ -1,0 +1,4 @@
+interface:
+  display_name: "WABA Template Replication"
+  short_description: "Set up WABA templates and loyalty or automation comm configs."
+  default_prompt: "Set up WABA templates for merchant <merchant_id> in <stage|prod> for <point|automation>."

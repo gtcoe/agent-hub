@@ -1,0 +1,67 @@
+{
+  "mcpServers": {
+    "local-mysql": {
+      "command": "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+      "args": [
+        "local-mysql"
+      ]
+    },
+    "staging-mysql": {
+      "command": "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+      "args": [
+        "staging-mysql"
+      ]
+    },
+    "prod-mysql": {
+      "command": "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+      "args": [
+        "prod-mysql"
+      ]
+    },
+    "staging-clickhouse": {
+      "command": "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+      "args": [
+        "staging-clickhouse"
+      ]
+    },
+    "prod-clickhouse": {
+      "command": "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+      "args": [
+        "prod-clickhouse"
+      ]
+    },
+    "staging-redis": {
+      "command": "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+      "args": [
+        "staging-redis"
+      ]
+    },
+    "gitlab": {
+      "command": "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+      "args": [
+        "gitlab"
+      ]
+    },
+    "atlassian": {
+      "command": "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+      "args": [
+        "atlassian"
+      ]
+    },
+    "staging-kafka": {
+      "command": "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+      "args": [
+        "staging-kafka"
+      ]
+    },
+    "figma": {
+      "command": "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+      "args": [
+        "figma"
+      ]
+    },
+    "notion": {
+      "url": "https://mcp.notion.com/mcp"
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "version": 2,
+  "layers": {
+    "core": {
+      "description": "Hub meta rules — always included for all agents",
+      "sources": [".agent-hub/instructions/core.md"]
+    },
+    "env": {
+      "description": "Staging/prod environment access reference",
+      "sources": [".agent-hub/instructions/staging-api.md"]
+    },
+    "shared": {
+      "description": "Repo layout, stack, auth, handler contract — always included",
+      "sources": [".agent-hub/instructions/shared/workspace.md"]
+    },
+    "rules": {
+      "description": "Team coding rules — coding style, Go patterns, testing, review, git, API, security, DB migrations",
+      "sources": [
+        ".agent-hub/instructions/rules/01-coding-style.md",
+        ".agent-hub/instructions/rules/02-golang-patterns.md",
+        ".agent-hub/instructions/rules/03-testing.md",
+        ".agent-hub/instructions/rules/04-code-review.md",
+        ".agent-hub/instructions/rules/05-git-workflow.md",
+        ".agent-hub/instructions/rules/06-api-design.md",
+        ".agent-hub/instructions/rules/07-security-extended.md",
+        ".agent-hub/instructions/rules/08-database-migrations.md"
+      ]
+    },
+    "reference": {
+      "description": "Long reference docs — cron patterns, ClickHouse patterns. Optional for context-limited agents.",
+      "sources": [
+        ".agent-hub/instructions/reference/09-cron-patterns.md",
+        ".agent-hub/instructions/reference/marketing-clickhouse.md"
+      ]
+    },
+    "features": {
+      "description": "Compact feature memories for common product and data flows.",
+      "sources": [
+        ".agent-hub/instructions/features/marketing/rfm.md",
+        ".agent-hub/instructions/features/loyalty/point-visit.md"
+      ]
+    }
+  },
+  "agentProfiles": {
+    "minimal": ["core", "env", "shared"],
+    "default": ["core", "env", "shared", "rules", "features"],
+    "full":    ["core", "env", "shared", "rules", "reference", "features"]
+  },
+  "agentOutputs": {
+    "claude": {
+      "profile": "full",
+      "agentLayer": ".agent-hub/instructions/agents/claude.md",
+      "embedSkills": false,
+      "output": "generated/claude/CLAUDE.md"
+    },
+    "codex": {
+      "profile": "full",
+      "agentLayer": ".agent-hub/instructions/agents/codex.md",
+      "embedSkills": false,
+      "output": "generated/codex/AGENTS.md"
+    },
+    "opencode": {
+      "profile": "full",
+      "agentLayer": null,
+      "embedSkills": true,
+      "output": "generated/opencode/AGENTS.md"
+    },
+    "github-copilot": {
+      "profile": "full",
+      "agentLayer": ".agent-hub/instructions/agents/copilot.md",
+      "embedSkills": false,
+      "output": "generated/copilot/copilot-instructions.md"
+    },
+    "cursor": {
+      "profile": "full",
+      "agentLayer": ".agent-hub/instructions/agents/cursor.md",
+      "embedSkills": true,
+      "output": "generated/cursor/AGENTS.md"
+    }
+  },
+  "canonicalOutput": "generated/instructions/AGENTS.md",
+  "installedRoots": {
+    "CLAUDE.md":                        "generated/claude/CLAUDE.md",
+    "AGENTS.md":                        "generated/codex/AGENTS.md",
+    ".github/copilot-instructions.md":  "generated/copilot/copilot-instructions.md"
+  }
+}

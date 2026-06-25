@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "serviceDetection": {
+    "strategy": "cwd-basename",
+    "description": "Used by agent-mcp to choose service-specific MySQL DB and Redis DB from the current working directory."
+  },
+  "mysqlDatabases": {
+    "payments": "paymentDB",
+    "marketing": "marketingDB",
+    "user-service": "userDB",
+    "location": "locationDB",
+    "guardian": "casbin",
+    "batch-processor": "batchProcessorDB",
+    "comm": "commDB",
+    "order": "orderDB",
+    "aggregator": "aggregator",
+    "demand-aggregator": "demandAggregatorDB",
+    "delivery": "deliveryDB",
+    "schedular": "schedularDB",
+    "cart": "cartDB",
+    "promo": "promoDB",
+    "loyalty": "loyaltyDB",
+    "chatbot": "chatbotDB",
+    "notification": "notificationDB",
+    "report-api": "reportingDB",
+    "reports-api": "reportingDB",
+    "personalization": "personalizationDB"
+  },
+  "redisDatabases": {
+    "payments": 1,
+    "marketing": 1,
+    "user-service": 3,
+    "location": 3,
+    "report-api": 5,
+    "reports-api": 5,
+    "guardian": 5,
+    "batch-processor": 6,
+    "comm": 8,
+    "order": 9,
+    "aggregator": 10,
+    "demand-aggregator": 10,
+    "delivery": 10,
+    "schedular": 10,
+    "cart": 11,
+    "promo": 12,
+    "loyalty": 12,
+    "twoc": 13,
+    "chatbot": 14
+  }
+}

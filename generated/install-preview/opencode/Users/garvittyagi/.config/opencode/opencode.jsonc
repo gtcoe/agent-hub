@@ -1,0 +1,90 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "local-mysql": {
+      "type": "local",
+      "command": [
+        "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+        "local-mysql"
+      ],
+      "enabled": true
+    },
+    "staging-mysql": {
+      "type": "local",
+      "command": [
+        "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+        "staging-mysql"
+      ],
+      "enabled": true
+    },
+    "prod-mysql": {
+      "type": "local",
+      "command": [
+        "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+        "prod-mysql"
+      ],
+      "enabled": true
+    },
+    "staging-clickhouse": {
+      "type": "local",
+      "command": [
+        "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+        "staging-clickhouse"
+      ],
+      "enabled": true
+    },
+    "prod-clickhouse": {
+      "type": "local",
+      "command": [
+        "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+        "prod-clickhouse"
+      ],
+      "enabled": true
+    },
+    "staging-redis": {
+      "type": "local",
+      "command": [
+        "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+        "staging-redis"
+      ],
+      "enabled": true
+    },
+    "gitlab": {
+      "type": "local",
+      "command": [
+        "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+        "gitlab"
+      ],
+      "enabled": true
+    },
+    "atlassian": {
+      "type": "local",
+      "command": [
+        "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+        "atlassian"
+      ],
+      "enabled": true
+    },
+    "staging-kafka": {
+      "type": "local",
+      "command": [
+        "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+        "staging-kafka"
+      ],
+      "enabled": true
+    },
+    "figma": {
+      "type": "local",
+      "command": [
+        "/Users/garvittyagi/Documents/dotpe_new/ai/.agent-hub/bin/agent-mcp.js",
+        "figma"
+      ],
+      "enabled": true
+    },
+    "notion": {
+      "type": "remote",
+      "url": "https://mcp.notion.com/mcp",
+      "enabled": true
+    }
+  }
+}
