@@ -1,0 +1,9 @@
+# Backups of live agent configs — may contain tokens from old non-hub configs
+backups/
+
+# Runtime state
+run/
+
+# Secrets (the inner secrets/.env is also gitignored, but belt-and-suspenders)
+secrets/.env
+secrets/*.local
