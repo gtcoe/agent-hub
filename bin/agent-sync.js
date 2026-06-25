@@ -214,11 +214,33 @@ function mcpAdapterFor(serverName, server) {
   return { command: launcher, args: [serverName] };
 }
 
+function copilotAdapterFor(serverName, server) {
+  const base = {
+    tools: ["*"],
+    timeout: 3000,
+  };
+
+  if (server.type === "remote") {
+    return {
+      ...base,
+      type: "http",
+      url: server.url,
+    };
+  }
+
+  return {
+    ...base,
+    type: "local",
+    command: launcher,
+    args: [serverName],
+  };
+}
+
 function generateCopilot(mcpRegistry) {
   const mcpServers = {};
   for (const [name, server] of Object.entries(mcpRegistry.servers)) {
     if (server.manual) continue;
-    mcpServers[name] = mcpAdapterFor(name, server);
+    mcpServers[name] = copilotAdapterFor(name, server);
   }
   return writeFile("generated/copilot/mcp-config.json", JSON.stringify({ mcpServers }, null, 2) + "\n");
 }

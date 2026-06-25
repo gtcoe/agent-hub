@@ -1,38 +1,75 @@
 # Agent Hub
 
-Central registry for terminal coding agents in this workspace.
+Central control plane for agent configuration in this workspace.
 
-The goal is one source of truth:
+Agent Hub keeps MCP servers, instruction layers, and skill sources in one place, then generates agent-specific adapters for Codex, Claude, Copilot, Cursor, and OpenCode.
 
-- Add an MCP server in `.agent-hub/registry/mcps.json`.
-- Add an instruction source in `.agent-hub/registry/instructions.json`.
-- Add a skill under `.agent-hub/skills/<skill-name>/SKILL.md`.
-- Run `node .agent-hub/bin/agent-sync.js`.
-- Agent-specific adapter files are generated under `.agent-hub/generated`.
+## Why Agent Hub
 
-Do not put secrets in agent-native config files. Agent-native configs should point to:
+- Single source of truth for MCP, instructions, and skills.
+- No secret sprawl in agent-native files.
+- Consistent setup across multiple coding agents.
+- Fast regeneration when adding or updating tools.
 
-```bash
-.agent-hub/bin/agent-mcp.js <server-name>
+## How It Works
+
+```text
+registry/* + instructions/* + skills/*
+                     |
+                     v
+          bin/agent-sync.js
+                     |
+                     v
+              generated/*
+                     |
+                     v
+    agent-install -> live agent configs
 ```
 
-Secrets are resolved at runtime from `.agent-hub/secrets/.env` or process environment.
+## Project Layout
 
-## Files
-
-- `registry/mcps.json`: central MCP registry and profile membership.
-- `registry/services.json`: service-name to MySQL/Redis DB mapping.
-- `registry/instructions.json`: canonical instruction source list.
-- `registry/skills.json`: canonical skill roots.
-- `bin/agent-mcp.js`: universal stdio MCP launcher.
-- `bin/agent-sync.js`: generates Codex, Claude, OpenCode, Copilot adapters.
-- `bin/agent-validate.js`: validates registry consistency and checks generated files for obvious secrets.
-- `generated/`: generated adapter output. Do not edit manually.
+- `registry/mcps.json`: MCP definitions and profiles.
+- `registry/instructions.json`: instruction layers and output mappings.
+- `registry/skills.json`: skill roots and generated skill index target.
+- `registry/agents.json`: live config targets and install strategies per agent.
+- `instructions/`: reusable instruction sources.
+- `skills/`: reusable agent skills.
+- `bin/agent-mcp.js`: universal MCP launcher.
+- `bin/agent-sync.js`: generates all adapter outputs.
+- `bin/agent-validate.js`: validates registry and generated artifacts.
+- `bin/agent-install.js`: plans, previews, and applies generated configs.
+- `generated/`: generated outputs. Treat as build artifacts.
 - `secrets/.env.example`: local secret template.
+
+## Quick Start
+
+```bash
+cp agent-hub/secrets/.env.example agent-hub/secrets/.env
+chmod 600 agent-hub/secrets/.env
+
+node agent-hub/bin/agent-sync.js
+node agent-hub/bin/agent-validate.js
+```
+
+## Daily Workflow
+
+1. Update source of truth.
+   - MCPs: `agent-hub/registry/mcps.json`
+   - Instructions: `agent-hub/registry/instructions.json`
+   - Skills: `agent-hub/skills/<skill-name>/SKILL.md`
+2. Regenerate artifacts.
+   - `node agent-hub/bin/agent-sync.js`
+3. Validate.
+   - `node agent-hub/bin/agent-validate.js`
+4. Preview changes to live configs.
+   - `node agent-hub/bin/agent-install.js --plan`
+   - `node agent-hub/bin/agent-install.js --dry-run`
+5. Apply for one agent.
+   - `node agent-hub/bin/agent-install.js --apply --agent codex`
 
 ## Profiles
 
-Set `AGENT_HUB_PROFILE` before launching an agent:
+Set the runtime profile before launching an agent:
 
 ```bash
 export AGENT_HUB_PROFILE=safe-data
@@ -40,61 +77,58 @@ export AGENT_HUB_PROFILE=safe-data
 
 Available profiles:
 
-- `offline`: local-only.
-- `work`: normal full work profile.
-- `safe-data`: read-only data and work tools.
-- `groww-manual`: Groww MCP only; use only when Groww access is explicitly needed.
+- `offline`: Local-only setup.
+- `work`: Full default profile for normal development.
+- `safe-data`: Read-only data access profile.
+- `groww-manual`: Groww MCP only.
 
-## Manual MCPs
+## Security Model
 
-Some MCPs can trigger browser authorization or noisy reconnect behavior. These stay in
-the registry, but are marked manual and are not installed into normal agent configs.
+- Keep secrets only in `agent-hub/secrets/.env` or process environment.
+- Do not hardcode credentials in registry or generated files.
+- Generated outputs are not the source of truth.
+- Prefer `safe-data` profile for routine work.
 
-Current manual MCPs:
+## Useful Commands
 
-- `growwmcp`: Groww remote MCP via `mcp-remote`.
-
-Check it explicitly without installing it into all agents:
-
-```bash
-AGENT_HUB_PROFILE=groww-manual .agent-hub/bin/agent-mcp.js growwmcp --check
-```
-
-## Workflow
+Check one MCP resolves correctly:
 
 ```bash
-cp .agent-hub/secrets/.env.example .agent-hub/secrets/.env
-chmod 600 .agent-hub/secrets/.env
-
-node .agent-hub/bin/agent-sync.js
-node .agent-hub/bin/agent-validate.js
-```
-
-Review `.agent-hub/generated` before installing generated config into live agent config paths.
-
-Check one MCP without starting it:
-
-```bash
-.agent-hub/bin/agent-mcp.js staging-mysql --check
-```
-
-To migrate values from existing legacy configs without printing secrets:
-
-```bash
-node .agent-hub/bin/agent-migrate-secrets.js
-```
-
-If `.agent-hub/secrets/.env` already exists, use `--force` only after confirming you want to overwrite it.
-
-Preview live agent config installation without modifying live files:
-
-```bash
-node .agent-hub/bin/agent-install.js --plan
-node .agent-hub/bin/agent-install.js --dry-run
+agent-hub/bin/agent-mcp.js staging-mysql --check
 ```
 
 Probe MCP connectivity through the central launcher:
 
 ```bash
-node .agent-hub/bin/agent-test-mcps.js
+node agent-hub/bin/agent-test-mcps.js
 ```
+
+Migrate existing local secrets into Agent Hub format:
+
+```bash
+node agent-hub/bin/agent-migrate-secrets.js
+```
+
+## Troubleshooting
+
+### Warning: instruction source not found under `.agent-hub/...`
+
+If sync prints missing source warnings with `.agent-hub` paths while your folder is `agent-hub`, update source paths in `agent-hub/registry/instructions.json` (and any related registry files) to the active directory name.
+
+### Copilot CLI hangs while loading MCP servers
+
+Use MCP server timeouts in Copilot config and keep generated config installed from Agent Hub.
+
+### MCP server works in one agent but not another
+
+Run `--dry-run` install and compare each agent's live config target defined in `agent-hub/registry/agents.json`.
+
+## Supported Agents
+
+- Codex
+- Claude
+- GitHub Copilot
+- Cursor
+- OpenCode
+
+For full setup and migration details, see `agent-hub/SETUP.md` and `agent-hub/MIGRATION.md`.
